@@ -1,13 +1,12 @@
-import torchvision
-import torch
-import torch.nn as nn
+
 from torch.utils.data import DataLoader
-from torch.nn.functional as F
+import torch.nn as nn
+import torch.nn.functional as F
 from torch.optim import Adam
 from torchvision.datasets import MNIST
 from torchvision.transforms import Compose,ToTensor,Normalize
 
-BATCH_SIZE = 128
+BATCH_SIZE = 256
 
 #1.Datas
 def get_dataloader(train = True):
@@ -20,21 +19,39 @@ def get_dataloader(train = True):
     return data_loader
 
 #2.Model
-class MnistModel(nn.Moudle):
-    def __init__(self)
+class MnistModel(nn.Module):
+    def __init__(self):
         super(MnistModel,self).__init__()
-        self.fcl = nn.liner(1*28*28,28)
+        self.fc1 = nn.Linear(1*28*28,28)
         self.fc2 = nn.Linear(28,10)
-    def forward(self,imput):
+
+    def forward(self,input):
+
         #1修改形状
         x = input.view([input.size(0),1*28*28])
         #2全连接
-        x = self.fcl(x)
+        x = self.fc1(x)
         #3激活函数,形状无变化
         x = F.relu(x)
         #4输出层
         out = self.fc2(x)
         return F.log_softmax(out)
 
-def train(epoch)
-    model = MnistModel()
+model = MnistModel()
+optimizer = Adam(model.parameters(),lr = 0.001)
+
+def train(epoch):
+    data_loader = get_dataloader()
+    for idx,(input,traget) in enumerate(data_loader):
+        optimizer.zero_grad()
+        output = model(input)     #调用模型
+        loss = F.nll_loss(output,traget)#得到损失函数
+        loss.backward()    #反向传播
+        optimizer.step()
+        if idx%100 == 0:
+            print(loss.item())
+
+
+if __name__ == '__main__':
+    for i in range(3):
+        train(i)
